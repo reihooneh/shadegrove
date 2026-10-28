@@ -1,0 +1,96 @@
+<!--{"title": "Plan a street: Shadegrove", "description": "Choose a street, a hot day and a number of trees; Shadegrove places them where they keep the most people out of the hottest sun.", "nav": "plan", "script": "plan.js"}-->
+    <div class="wrap planner">
+      <form class="panel" id="form" novalidate>
+        <h1 class="visually-hidden">Plan a street</h1>
+        <div class="field">
+          <label for="scene">Street</label>
+          <select id="scene"></select>
+          <div class="file-row">
+            <label class="field-label" for="file">Or load your own scene (JSON, up to 256 KB)</label>
+            <input type="file" id="file" accept="application/json,.json">
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="date">Hot day</label>
+            <input type="date" id="date" min="1950-01-01" max="2150-12-31" required>
+          </div>
+          <div class="field">
+            <label for="temp">Top °C</label>
+            <input type="number" id="temp" min="20" max="55" step="1" required>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="from">From (hour)</label>
+            <input type="number" id="from" min="4" max="22" step="0.5" required>
+          </div>
+          <div class="field">
+            <label for="to">To (hour)</label>
+            <input type="number" id="to" min="5" max="23" step="0.5" required>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="budget">Trees to plant</label>
+            <input type="number" id="budget" min="1" max="80" step="1" required>
+          </div>
+          <div class="field">
+            <label for="year">Judge them at age (years)</label>
+            <input type="number" id="year" min="1" max="40" step="1" required>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="spacing">Space between trees (m)</label>
+            <input type="number" id="spacing" min="2" max="30" step="0.5" required>
+          </div>
+          <div class="field">
+            <label for="share">Most from one species (%)</label>
+            <input type="number" id="share" min="10" max="100" step="5" required>
+          </div>
+        </div>
+        <fieldset class="field">
+          <legend>Species the planner may use</legend>
+          <div class="checks" id="species"></div>
+        </fieldset>
+        <p class="error" id="form-error" role="alert"></p>
+        <button class="button primary" type="submit" id="go">Plan the trees</button>
+      </form>
+
+      <section class="result" aria-labelledby="result-title">
+        <h2 id="result-title">The plan</h2>
+        <p class="status" id="status" aria-live="polite">Loading the planner…</p>
+        <div class="toggle" role="group" aria-label="What the footpath colours show">
+          <button type="button" id="show-before" aria-pressed="false">The street today</button>
+          <button type="button" id="show-after" aria-pressed="true">With the plan</button>
+        </div>
+        <div class="view" id="plan-view"></div>
+        <p class="view-hint">Drag to turn, scroll to zoom, or use the arrow keys and + and − when the view is focused. Rings are possible planting sites.</p>
+        <div class="legend"><span>Shaded all day</span><span class="ramp" aria-hidden="true"></span><span>Most hot sun</span></div>
+        <div class="scrub">
+          <label for="time">Time of day</label>
+          <input type="range" id="time" min="0" max="0" value="0">
+          <p class="readout" id="readout" aria-live="polite"></p>
+        </div>
+        <div class="summary" id="summary">
+          <div><span class="big" id="sum-cut">&nbsp;</span><span>less hot sun on the footpaths at the chosen age</span></div>
+          <div><span class="big" id="sum-guarantee">&nbsp;</span><span>of the best possible plan, at the very least</span></div>
+          <div><span class="big" id="sum-winter">&nbsp;</span><span>of the winter sun the trees take away</span></div>
+        </div>
+        <h3>Trees, best first</h3>
+        <p>Each tree's share counts only the sun the trees above it don't already block.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th class="num">Order</th><th>Site</th><th>Species</th><th class="num">Hot sun removed</th></tr></thead>
+            <tbody id="picks"></tbody>
+          </table>
+        </div>
+        <ul class="notes" id="notes"></ul>
+        <div class="actions">
+          <button class="button" type="button" id="dl-csv">Download the plan (CSV)</button>
+          <button class="button" type="button" id="dl-scene">Download the scene (JSON)</button>
+          <a class="button" id="to-grow" href="grow.html">Watch these trees grow</a>
+        </div>
+      </section>
+    </div>
