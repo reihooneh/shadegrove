@@ -1,0 +1,70 @@
+<!--{"title": "How it works: Shadegrove", "description": "The sun model, how shade through leaves is measured, why placing trees one at a time works, and the bound that proves how good a plan is.", "nav": "method", "script": "method.js"}-->
+    <article class="wrap prose">
+      <h1>How Shadegrove plans</h1>
+      <p class="lede">Four ideas, each simple on its own: where the sun is, how much of it leaves let through, how much each moment matters, and how to choose trees so that the choice can be checked.</p>
+
+      <h2>Where the sun is</h2>
+      <p>For every quarter of an hour, the sun's height and compass direction come from the equations behind the US National Oceanic and Atmospheric Administration's solar calculator: the Earth's tilt and orbit give the sun's declination and the equation of time, and the place, date and clock give the angle above the horizon. A ray is then traced from shoulder height on every square metre of footpath towards the sun. If it hits a building, that square is in shade.</p>
+      <p>The planner checks itself against geometry you can work out by hand. These values are computed live, in your browser, by the same engine that plans the trees:</p>
+      <div class="table-wrap check-table">
+        <table>
+          <thead><tr><th>Check</th><th class="num">By hand</th><th class="num">Planner</th></tr></thead>
+          <tbody id="check"></tbody>
+        </table>
+      </div>
+
+      <h2>How much sun leaves let through</h2>
+      <p>A crown is drawn as an ellipsoid sized for the tree's species and age. Light fades exponentially with the distance it travels through leaves (the Beer–Lambert law), so a ray through the middle of a dense brush box lets through about 15% of the sun and a ray grazing the edge lets through most of it.</p>
+      <figure class="figure">
+        <svg viewBox="0 0 560 250" role="img" aria-label="Two sun rays reaching a walker: one passes through the middle of a crown and is mostly blocked, one grazes the edge and mostly gets through">
+          <rect x="0" y="186" width="560" height="10" fill="#d6ddd6"/>
+          <ellipse cx="300" cy="96" rx="92" ry="62" fill="#4f8f62" opacity="0.85"/>
+          <rect x="294" y="150" width="12" height="46" fill="#5a4636"/>
+          <line x1="150" y1="176" x2="452" y2="16" stroke="#f2c230" stroke-width="5"/>
+          <line x1="60" y1="176" x2="330" y2="30" stroke="#e4682b" stroke-width="5" stroke-dasharray="10 6"/>
+          <circle cx="150" cy="176" r="9" fill="#123238"/>
+          <circle cx="60" cy="176" r="9" fill="#123238"/>
+          <text x="20" y="220">Solid ray: through the middle, little sun gets through</text>
+          <text x="20" y="240">Dashed ray: grazes the edge, most sun gets through</text>
+        </svg>
+        <figcaption>Sun through a crown: the fraction let through is (fraction through the middle) raised to the power of (path length ÷ crown depth).</figcaption>
+      </figure>
+
+      <h2>Why some sun matters more</h2>
+      <p>Each moment's sun is weighted by the strength of the direct beam (stronger with the sun high, from a clear-sky model) and by how hot the air is then, from a curve that peaks at 3 pm at the day's top temperature. Each square of footpath is weighted by how busy it is. Sun at 3 pm outside a station counts many times more than sun at 9 am on a quiet corner.</p>
+      <p class="formula">hot sun on the footpaths = Σ over squares and moments of (busyness × beam × heat × fraction of sun getting through)</p>
+
+      <h2>Choosing trees one at a time</h2>
+      <p>The planner adds the tree that removes the most hot sun still left, then the next, and so on until the budget runs out, skipping sites too close to a chosen tree and any species that already makes up its share of the plan. This is the greedy method, and for this kind of problem it is provably good: removed sun can only grow as trees are added, and a tree helps less when others already shade the same footpath (two crowns in a row each let through a fraction of what reaches them, so the second has less to block). Functions with these two properties are called monotone submodular, and for them greedy choice is always within 63% of the best possible plan of the same size.</p>
+      <figure class="figure">
+        <svg viewBox="0 0 560 190" role="img" aria-label="Bars showing that the first tree removes the most sun and each later tree removes a little less">
+          <line x1="40" y1="160" x2="540" y2="160" stroke="#b9c4bd"/>
+          <rect x="60" y="30" width="56" height="130" fill="#2e6a4c"/>
+          <rect x="140" y="44" width="56" height="116" fill="#2e6a4c"/>
+          <rect x="220" y="62" width="56" height="98" fill="#2e6a4c"/>
+          <rect x="300" y="84" width="56" height="76" fill="#2e6a4c"/>
+          <rect x="380" y="104" width="56" height="56" fill="#2e6a4c"/>
+          <rect x="460" y="122" width="56" height="38" fill="#2e6a4c"/>
+          <text x="60" y="182">first tree</text>
+          <text x="440" y="182">sixth tree</text>
+        </svg>
+        <figcaption>Diminishing returns: each tree's gain counts only the sun the trees before it don't already block.</figcaption>
+      </figure>
+
+      <h2>The bound: how close to the best?</h2>
+      <p>Diminishing returns also give a ceiling. Whatever the best plan of the same size is, it can't remove more than the planner's plan does plus the largest extra gains its trees could each still add, one per site. Shadegrove computes that ceiling for every plan and reports the plan as a share of it. On the terrace street:</p>
+      <div class="table-wrap check-table">
+        <table>
+          <tbody id="bound"></tbody>
+        </table>
+      </div>
+      <p>In the test suite, the planner is also checked against an exhaustive search of every possible plan on 40 small random streets: it finds the very best plan in most of them and is never below 63% of it.</p>
+
+      <h2>What it leaves out</h2>
+      <ul>
+        <li>Buildings are blocks and crowns are ellipsoids; real roofs and branches are messier.</li>
+        <li>Only direct sun is counted, not heat reflected off walls or radiating from the road.</li>
+        <li>Species figures are indicative. Underground services, sight lines and your council's street-tree guide come first.</li>
+        <li>A plan is for one hot day; try a few dates to see how robust it is.</li>
+      </ul>
+    </article>
