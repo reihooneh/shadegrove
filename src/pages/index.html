@@ -1,0 +1,48 @@
+<!--{"title": "Shadegrove: plant the shade where people walk", "description": "Plans street trees for shade: traces the sun through a hot day and places each tree where it keeps the most people out of the hottest sun.", "nav": "index", "script": "home.js"}-->
+    <section class="hero on-dark">
+      <div class="wrap hero-grid">
+        <div>
+          <h1>Plant the shade where people walk</h1>
+          <p class="lede">Shadegrove follows the sun across a street through a hot summer day, measures how much of it lands on people, and works out which trees, planted where, would keep the most of them in the shade by the time the trees have grown.</p>
+          <div class="actions">
+            <a class="button primary" href="plan.html">Plan a street</a>
+            <a class="button" href="method.html">How it works</a>
+          </div>
+        </div>
+        <div>
+          <div class="view" id="hero-view"></div>
+          <p class="view-hint">Drag to turn the street, scroll to zoom. The footpath glows where the hot sun falls; the trees are the plan, ten years on.</p>
+          <div class="scrub">
+            <label for="hero-time">Time of day</label>
+            <input type="range" id="hero-time" min="0" max="0" value="0">
+            <p class="readout" id="hero-readout" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" aria-labelledby="street-numbers">
+      <h2 id="street-numbers">One terrace street, ten trees</h2>
+      <p>The street in the view runs east to west through an inner-city suburb on a 38 °C January day. Here is what the plan does for it.</p>
+      <div class="facts" id="facts">
+        <div class="fact"><span class="big" id="fact-cut">&nbsp;</span><p>less hot sun on the footpaths after ten years, weighted by how hot each hour is and how busy each footpath is.</p></div>
+        <div class="fact"><span class="big" id="fact-guarantee">&nbsp;</span><p>of the best any ten trees could do, at the very least. The planner proves this bound for every plan it makes.</p></div>
+        <div class="fact"><span class="big" id="fact-winter">&nbsp;</span><p>of the winter sun the same trees take away in July, because most of the chosen species drop their leaves.</p></div>
+      </div>
+      <p class="status" id="home-status" aria-live="polite">Working out the plan…</p>
+    </section>
+
+    <section class="section wrap" aria-labelledby="how">
+      <h2 id="how">How a plan is made</h2>
+      <ol class="steps">
+        <li><h3>Trace the sun</h3><p>Every quarter of an hour, the sun's position for that place and date, and which bits of footpath buildings and existing trees already shade.</p></li>
+        <li><h3>Weigh the hours</h3><p>Sun at 3 pm on a 38 °C day matters far more than sun at 9 am, and a busy footpath more than a quiet one.</p></li>
+        <li><h3>Place trees one by one</h3><p>Each step adds the tree that removes the most of the sun still left, after the trees already chosen, at its size in ten years.</p></li>
+        <li><h3>Prove how close it is</h3><p>Because each new tree helps less than the last, the planner can put a hard ceiling on what any plan could achieve, and show how near its own plan comes.</p></li>
+      </ol>
+    </section>
+
+    <section class="section wrap" aria-labelledby="streets">
+      <h2 id="streets">Try a street</h2>
+      <div class="streets" id="street-links"></div>
+    </section>
