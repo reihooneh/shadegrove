@@ -185,8 +185,8 @@ func TestGreedyAgainstExhaustiveSearch(t *testing.T) {
 	for trial := 0; trial < trials; trial++ {
 		s := scene(t, randomScene(rng))
 		e := Measure(s, MakeGrid(s), false)
-		p := Optimise(s, e)
-		cands := candidates(s, e, float64(s.Year), false)
+		p := must(Optimise(s, e))
+		cands := must(candidates(s, e, float64(s.Year), false))
 		best := 0.0
 		var walk func(start int, set []int)
 		walk = func(start int, set []int) {
@@ -256,7 +256,7 @@ func TestGreedyAgainstExhaustiveSearch(t *testing.T) {
 func TestSubmodular(t *testing.T) {
 	s := scene(t, string(must(os.ReadFile("../scenes/terrace-street.json"))))
 	e := Measure(s, MakeGrid(s), false)
-	cands := candidates(s, e, 10, false)
+	cands := must(candidates(s, e, 10, false))
 	rng := rand.New(rand.NewPCG(1, 2))
 	for trial := 0; trial < 200; trial++ {
 		a := []int{rng.IntN(len(cands))}
@@ -283,7 +283,7 @@ func must[T any](v T, err error) T {
 func TestBundledScenes(t *testing.T) {
 	for _, name := range []string{"terrace-street", "city-avenue", "town-square"} {
 		s := scene(t, string(must(os.ReadFile("../scenes/"+name+".json"))))
-		r := Run(s)
+		r := must(Run(s))
 		p := r.Plan
 		if len(p.Picks) == 0 || p.Reduction <= 0.05 || p.Guarantee <= 0.4 || p.Guarantee > 1 {
 			t.Errorf("%s: %d picks, %.3f removed, guarantee %.3f", name, len(p.Picks), p.Reduction, p.Guarantee)
@@ -342,7 +342,7 @@ func TestDeciduousTreesKeepWinterSun(t *testing.T) {
 	base := `{"latitude": -33.9, "longitude": 151.2, "utcOffset": 11, "date": "2026-01-15", "budget": 1, "targetYear": 20,
  "walks": [{"x0": -10, "y0": -10, "x1": 10, "y1": 10}], "sites": [{"id": "A", "x": 0, "y": 0}], "species": ["SPECIES"]}`
 	run := func(sp string) Seasons {
-		return Run(scene(t, strings.Replace(base, "SPECIES", sp, 1))).Seasons
+		return must(Run(scene(t, strings.Replace(base, "SPECIES", sp, 1)))).Seasons
 	}
 	elm, box := run("chinese-elm"), run("brush-box")
 	if elm.WinterLost >= box.WinterLost {
@@ -400,4 +400,25 @@ func FuzzParseScene(f *testing.F) {
 			t.Fatal("a scene that passed validation is incomplete")
 		}
 	})
+}
+
+func TestHugeScenesAreRefusedNotRun(t *testing.T) {
+	var sites []string
+	for i := 0; i < MaxSites; i++ {
+		sites = append(sites, fmt.Sprintf(`{"id": "S%d", "x": %d, "y": %d}`, i, -40+(i%9)*10, -40+(i/9)*10))
+	}
+	text := `{"latitude": -33.9, "longitude": 151.2, "utcOffset": 11, "date": "2026-01-15", "fromHour": 5, "toHour": 21,
+ "stepMinutes": 10, "targetYear": 40, "walks": [{"x0": -45, "y0": -45, "x1": 45, "y1": 45}], "sites": [` + strings.Join(sites, ",") + `]}`
+	s := scene(t, text)
+	g := MakeGrid(s)
+	if len(g.Cells)*len(g.Steps) > MaxCellSteps {
+		t.Fatalf("the grid wasn't coarsened: %d cells x %d steps", len(g.Cells), len(g.Steps))
+	}
+	r, err := Run(s)
+	if err != nil && err != ErrTooBig {
+		t.Fatalf("unexpected error %v", err)
+	}
+	if err == nil && len(r.Plan.Picks) == 0 {
+		t.Fatal("a big scene that runs still gives a plan")
+	}
 }

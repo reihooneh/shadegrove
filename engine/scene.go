@@ -146,6 +146,16 @@ func (s *Scene) Validate() error {
 	if s.Name == "" {
 		s.Name = "Untitled street"
 	}
+	// Empty lists stay lists (never null) in the JSON sent back to the page.
+	if s.Buildings == nil {
+		s.Buildings = []Box{}
+	}
+	if s.Existing == nil {
+		s.Existing = []Tree{}
+	}
+	if s.Species == nil {
+		s.Species = []string{}
+	}
 	if !nameRe.MatchString(s.Name) {
 		return bad("the name uses letters, digits, spaces and ' . , & ( ) / - (up to 60)")
 	}

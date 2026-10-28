@@ -52,7 +52,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "shadegrove: the scene could not be read")
 		return 2
 	}
-	res := engine.Run(scene)
+	res, err := engine.Run(scene)
+	if err != nil {
+		fmt.Fprintf(stderr, "shadegrove: %s\n", err)
+		return 2
+	}
 	if asJSON {
 		enc := json.NewEncoder(stdout)
 		if err := enc.Encode(res); err != nil {

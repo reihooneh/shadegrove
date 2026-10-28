@@ -43,7 +43,11 @@ func plan(_ js.Value, args []js.Value) (out any) {
 		}
 		return reply(map[string]string{"error": "the scene could not be read"})
 	}
-	return reply(engine.Run(scene))
+	res, err := engine.Run(scene)
+	if err != nil {
+		return reply(map[string]string{"error": err.Error()})
+	}
+	return reply(res)
 }
 
 func catalogue(_ js.Value, _ []js.Value) any { return reply(engine.Catalogue) }

@@ -41,8 +41,16 @@ type Plan struct {
 }
 
 // crowns builds every allowed (site, species) candidate at the target year.
-func candidates(s *Scene, e *Exposure, years float64, winter bool) []candidate {
+// MaxEntries caps the shade records kept for all candidates (about 8 bytes each), so a huge scene
+// is refused with an explanation instead of exhausting memory.
+const MaxEntries = 12_000_000
+
+// ErrTooBig is returned when a scene would need more work than one run allows.
+var ErrTooBig = &InputError{Msg: "this scene is too big for one run: use fewer sites, fewer species, shorter hours or a longer step"}
+
+func candidates(s *Scene, e *Exposure, years float64, winter bool) ([]candidate, error) {
 	var out []candidate
+	total := 0
 	steps := e.Grid.Steps
 	for si, site := range s.Sites {
 		for _, sp := range s.AllowedSpecies() {
@@ -71,6 +79,9 @@ func candidates(s *Scene, e *Exposure, years float64, winter bool) []candidate {
 					if tr < 0.999 {
 						cand.index = append(cand.index, int32(i))
 						cand.through = append(cand.through, float32(tr))
+						if total++; total > MaxEntries {
+							return nil, ErrTooBig
+						}
 					}
 				}
 			}
@@ -79,7 +90,7 @@ func candidates(s *Scene, e *Exposure, years float64, winter bool) []candidate {
 			}
 		}
 	}
-	return out
+	return out, nil
 }
 
 // gain is how much heat-weighted sun a candidate would remove, given what gets through now.
@@ -150,11 +161,14 @@ func MaxPerSpecies(s *Scene) int {
 // greedy choice is provably within (1 - 1/e) ≈ 63% of the best plan of the same size, and lazy
 // evaluation is exact: a gain can only shrink as the plan grows, so a stale gain at the top of
 // the queue that is still the best after recomputing is truly the best.
-func Optimise(s *Scene, e *Exposure) *Plan {
-	cands := candidates(s, e, float64(s.Year), false)
+func Optimise(s *Scene, e *Exposure) (*Plan, error) {
+	cands, err := candidates(s, e, float64(s.Year), false)
+	if err != nil {
+		return nil, err
+	}
 	now := append([]float64(nil), e.Sunlit...)
 	before := e.Total(now)
-	p := &Plan{Before: before, Candidates: len(cands)}
+	p := &Plan{Before: before, Candidates: len(cands), Picks: []Pick{}}
 
 	q := make(queue, 0, len(cands))
 	for i := range cands {
@@ -215,7 +229,7 @@ func Optimise(s *Scene, e *Exposure) *Plan {
 	} else {
 		p.Guarantee = 1
 	}
-	return p
+	return p, nil
 }
 
 func share(a, b float64) float64 {

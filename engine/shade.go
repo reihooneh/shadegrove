@@ -31,12 +31,17 @@ type Grid struct {
 // MakeGrid cuts the walks into cells (as fine as 1 m, coarser if the walks are big) and the day
 // into steps with the sun up.
 func MakeGrid(s *Scene) *Grid {
+	st := steps(s)
+	limit := MaxCells
+	if len(st) > 0 {
+		limit = min(MaxCells, MaxCellSteps/len(st))
+	}
 	area := 0.0
 	for _, w := range s.Walks {
 		area += (w.X1 - w.X0) * (w.Y1 - w.Y0)
 	}
-	size := math.Max(1, math.Ceil(math.Sqrt(area/MaxCells)*4)/4)
-	for cellsFor(s, size) > MaxCells {
+	size := math.Max(1, math.Ceil(math.Sqrt(area/float64(limit))*4)/4)
+	for cellsFor(s, size) > limit {
 		size += 0.25
 	}
 	g := &Grid{CellSize: size}
@@ -50,7 +55,7 @@ func MakeGrid(s *Scene) *Grid {
 			}
 		}
 	}
-	g.Steps = steps(s)
+	g.Steps = st
 	return g
 }
 
