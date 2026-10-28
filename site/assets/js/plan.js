@@ -171,6 +171,7 @@ $('show-after').addEventListener('click', () => setMode('after'));
 $('file').addEventListener('change', async () => {
   const file = $('file').files[0];
   if (!file) return;
+  $('form-error').textContent = '';
   if (file.size > 256 * 1024) {
     $('form-error').textContent = 'That file is larger than 256 KB.';
     return;

@@ -228,7 +228,7 @@ test('planner: bad numbers are explained; a crafted link and a hostile file are 
     const junk = join(dir, 'scene.json');
     writeFileSync(junk, 'not json <script>alert(1)</script>');
     await page.setInputFiles('#file', junk);
-    assert.match(await page.textContent('#form-error'), /not a JSON scene/);
+    await page.waitForFunction(() => /not a JSON scene/.test(document.getElementById('form-error').textContent), null, { timeout: 30000 });
     const hostile = join(dir, 'hostile.json');
     writeFileSync(hostile, JSON.stringify({ name: '<img src=x onerror=alert(1)>', date: '2026-01-15', walks: [{ x0: 0, y0: 0, x1: 4, y1: 4 }], sites: [{ id: 'A', x: 1, y: 1 }] }));
     await page.setInputFiles('#file', hostile);
