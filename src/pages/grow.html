@@ -1,0 +1,25 @@
+<!--{"title": "Watch it grow: Shadegrove", "description": "How much shade a street-tree plan gives as the trees grow, and what each choice of species costs in winter sun.", "nav": "grow", "script": "grow.js"}-->
+    <div class="wrap grow-grid">
+      <section aria-labelledby="grow-title">
+        <h1 id="grow-title">Shade takes years</h1>
+        <p class="lede">A tree planted this winter barely shades its own pit next summer. Slide through the years to see the plan fill in.</p>
+        <div class="view" id="grow-view"></div>
+        <div class="scrub">
+          <label for="age">Years after planting</label>
+          <input type="range" id="age" min="0" max="0" value="0">
+          <p class="readout" id="age-readout" aria-live="polite"></p>
+        </div>
+        <p class="status" id="status" aria-live="polite">Planning four ways…</p>
+      </section>
+      <section aria-labelledby="compare-title">
+        <h2 id="compare-title">Four ways to plant the same street</h2>
+        <p>The same number of trees on the same sites, with the planner limited to different species.</p>
+        <div class="chart" id="chart"></div>
+        <ul class="key" id="key"></ul>
+        <div class="seasons">
+          <h3>Summer shade against winter sun</h3>
+          <p>Green is the hot summer sun removed once the trees reach the chosen age; grey is the winter sun the same trees take from the footpath in July.</p>
+          <div id="bars"></div>
+        </div>
+      </section>
+    </div>
