@@ -1,0 +1,6 @@
+node_modules/
+build/
+site/assets/shadegrove.wasm
+test-results/
+*.log
+.DS_Store
